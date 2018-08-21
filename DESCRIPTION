@@ -1,0 +1,15 @@
+Package: ADaM
+Type: Package
+Title: Utilities for working with ADaM files
+Version: 0.1.0
+Author: c(
+  person("Michael", "Kane",
+    role = c("aut", "cph", "cre"),
+    email = "kaneplusplus@pm.com",
+    comment = "http://orcid.org/0000-0003-1899-6662"
+    ))
+Description: More about what it does (maybe more than one line)
+License: LGPL-2
+Imports: tidyr, dplyr, purrr, foreach
+VignetteBuilder: knitr
+RoxygenNote: 6.1.0
