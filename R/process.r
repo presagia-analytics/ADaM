@@ -32,7 +32,6 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name) {
 #' x <- consolidate_adam(ruca)
 #' @importFrom tidyr nest_
 #' @importFrom dplyr full_join
-#' @importFrom purrr map2 
 #' @export
 consolidate_adam <- function(..., on = "USUBJID") {
   # Get the set of data sets.
@@ -50,6 +49,9 @@ consolidate_adam <- function(..., on = "USUBJID") {
                    list(c(on, setdiff(colnames(arg_list[[i]]), 
                                       colnames(arg_list[[i-1]])))))
   }
+  keep <- vapply(col_names, function(x) length(x) > 1, FALSE)
+  col_names <- col_names[keep]
+  arg_list <- arg_list[keep]
   ret <- arg_list[[1]][,col_names[[1]]]
   for (i in 2:length(arg_list)) {
     ret <- full_join(ret, arg_list[[i]][,col_names[[i]]], by = on)
@@ -65,7 +67,7 @@ consolidate_adam <- function(..., on = "USUBJID") {
 #' @examples
 #' data(adorirr)
 #' collapse_rows(adorirr)
-#' @importFrom tidyr nest
+#' @importFrom tidyr nest_
 #' @export
 collapse_rows <- function(x, key = "USUBJID", collapse_name = "data") {
   sv <- c(key, collapsable_vars(x, key))
