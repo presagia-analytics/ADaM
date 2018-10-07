@@ -1,6 +1,10 @@
 
 #' Normalize an ADam dataset.
 #' 
+#' @param x an ADaM formatted data.frame.
+#' @param on which variable should be collpased on? (Default: "USUBJID")
+#' @param collapse_name the variable name of the collapsed sub-data.frames.
+#' @return The collapsed data.frame with numerically encoded columens removed.
 #' @examples
 #' data(adorirr)
 #' normalize_adam(adorirr)
@@ -17,6 +21,10 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name) {
 
 #' Consolidate multiple data sets
 #'
+#' @param ... a set of ADaM formatted data.frames.
+#' @param on which variable should be collpased on? (Default: "USUBJID")
+#' @return A single data.frame composed of the collapsed and merged input
+#' data.frames.
 #' @examples
 #' data(adorirr, adefirr, adsl)
 #' ruca <- list(normalize_adam(adorirr), normalize_adam(adefirr), 
@@ -28,7 +36,6 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name) {
 #' @export
 consolidate_adam <- function(..., on = "USUBJID") {
   # Get the set of data sets.
-   browser() 
   arg_list <- as.list(...)
 
   # Make sure we have an on variable in each data set.
@@ -51,7 +58,10 @@ consolidate_adam <- function(..., on = "USUBJID") {
 }
 
 #' Collapse the rows of a data.frame object
-#'  
+#' 
+#' @param x and ADaM formatted data.frame
+#' @param key which variable should be collpased on? (Default: "USUBJID")
+#' @param collapse_name the variable name of the collapsed sub-data.frames.
 #' @examples
 #' data(adorirr)
 #' collapse_rows(adorirr)
@@ -69,7 +79,6 @@ collapse_rows <- function(x, key = "USUBJID", collapse_name = "data") {
 # For data frames with repeated subject ids.
 
 #' @importFrom foreach foreach %do%
-#' @export
 collapsable_vars <- function(x, group_var) {
   spl <- split(1:nrow(x), x[,group_var])
   check_vars <- setdiff(colnames(x), group_var)
@@ -82,9 +91,7 @@ collapsable_vars <- function(x, group_var) {
   check_vars[check_vals]
 }
 
-#' Find numerically encoded columns
-#' 
-#' @export
+# Find numerically encoded columns
 numerically_encoded_cols <- function(x) {
   num_enc <- grep("N$", colnames(x))
   num_enc_candidate <- colnames(x)[num_enc]
@@ -94,6 +101,8 @@ numerically_encoded_cols <- function(x) {
 
 #' Remove numerically encoded columns
 #' 
+#' @param x the ADaM formatted data.frame which may have numerically encoded
+#' columns.
 #' @examples
 #' data(adorirr)
 #' remove_numerically_encoded_columns(adorirr)

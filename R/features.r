@@ -1,4 +1,6 @@
-# ADORIRR
+#' Clovis ADORIRR trajetory clean
+#' @importFrom stats na.omit
+#' @importFrom dplyr %>% arrange
 #' @export
 clean_traj <- function(x) {
   ret <- x[as.numeric(x$AVALC) < 5 , c("ADY", "AVALC")] %>%
