@@ -8,7 +8,7 @@
 #' @examples
 #' data(adorirr)
 #' normalize_adam(adorirr)
-#' @importFrom dplyr %>%
+#' @importFrom dplyr %>% mutate_if
 #' @export
 normalize_adam <- function(x, on = "USUBJID", collapse_name) {
   if (missing(collapse_name)) {
@@ -16,7 +16,8 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name) {
   }
   x %>% 
     remove_numerically_encoded_columns %>% 
-    collapse_rows(on, collapse_name)
+    collapse_rows(on, collapse_name) %>%
+    mutate_if(is.character, as.factor)
 }
 
 #' Consolidate multiple data sets

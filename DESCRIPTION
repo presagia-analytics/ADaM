@@ -12,6 +12,7 @@ Description: A package for consolidating and processing ADaM files.
 Maintainer: Michael J. Kane <mkane@simulstat.com>
 License: LGPL-2
 Imports: tidyr, dplyr, foreach
-Suggests: knitr
+Suggests: knitr,
+    testthat
 VignetteBuilder: knitr
 RoxygenNote: 6.1.0
