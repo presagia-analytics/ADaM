@@ -1,4 +1,4 @@
-#' Clovis ADORIRR trajetory clean
+#' ADORIRR trajetory clean
 #' @importFrom stats na.omit
 #' @importFrom dplyr %>% arrange
 #' @export
