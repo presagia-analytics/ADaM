@@ -6,6 +6,8 @@
 #' their is a mapping between labels that makes them the same.
 #' @param x the first vector to test for equivalence.
 #' @param y the second vector to test for equivalence.
+#' @param factor_equiv_character should factors be treated as equivalend
+#' to characters? (default TRUE)
 #' @return A boolean is returned indicating whether or not the two
 #' vectors are equivalent.
 #' @examples
@@ -19,18 +21,21 @@
 #' # TRUE because they are the same (up to a label change).
 #' equiv(a, b)
 #' @export
-equiv <- function(x, y) {
+equiv <- function(x, y, factor_equiv_character = TRUE, ...) {
   UseMethod("equiv")
 }
 
 #' @export
-equiv.default <- function(x, y) {
-  stop(paste("Don't know how to test for equivalence between", class(x), "and",
-             "class(y)"))
+equiv.default <- function(x, y, factor_equiv_character = TRUE, ...) {
+  if (class(x) == class(y)) { 
+    warning(paste("Don't know how to test for equivalence between", 
+                  class(x), "and", class(y)))
+  }
+  FALSE
 }
 
 #' @export
-equiv.numeric <- function(x, y) {
+equiv.numeric <- function(x, y, factor_equiv_character = TRUE, ...) {
   ret <- FALSE
   if (is.numeric(y)) {
     x_nas <- which(is.na(x))
@@ -46,19 +51,15 @@ equiv.numeric <- function(x, y) {
   ret
 }
 
-#' @importFrom lpSolve lp.assign
-#' @export
-equiv.character <- function(x, y) {
+table_equiv <- function(x, y) {
   ret <- FALSE
-  if (is.character(y)) {
-    x_nas <- which(is.na(x))
-    y_nas <- which(is.na(y))
-    if (length(x_nas) == length(y_nas) && isTRUE(all(x_nas == y_nas))) {
-      wts <- table(x, y)
-      if (nrow(wts) == ncol(wts) && 
-          all.equal(lp.assign(wts, "max")$objval, sum(wts))) {
-        ret <- TRUE
-      }
+  x_nas <- which(is.na(x))
+  y_nas <- which(is.na(y))
+  if (length(x_nas) == length(y_nas) && isTRUE(all(x_nas == y_nas))) {
+    wts <- table(x, y)
+    if (nrow(wts) == ncol(wts) && 
+        all.equal(lp.assign(wts, "max")$objval, sum(wts))) {
+      ret <- TRUE
     }
   }
   ret
@@ -66,18 +67,26 @@ equiv.character <- function(x, y) {
 
 #' @importFrom lpSolve lp.assign
 #' @export
-equiv.factor <- function(x, y) {
+equiv.character <- function(x, y, factor_equiv_character = TRUE, ...) {
   ret <- FALSE
+  if (is.factor(y) && factor_equiv_character) {
+    y <- as.character(y)
+  }
+  if (is.character(y)) {
+    ret <- table_equiv(x, y)
+  }
+  ret
+}
+
+#' @importFrom lpSolve lp.assign
+#' @export
+equiv.factor <- function(x, y, factor_equiv_character = TRUE, ...) {
+  ret <- FALSE
+  if (is.character(y) && factor_equiv_character) {
+    y <- as.factor(y)
+  }
   if (is.factor(y)) {
-    x_nas <- which(is.na(x))
-    y_nas <- which(is.na(y))
-    if (length(x_nas) == length(y_nas) && isTRUE(all(x_nas == y_nas))) {
-      wts <- table(x, y)
-      if (nrow(wts) == ncol(wts) && 
-          all.equal(lp.assign(wts, "max")$objval, sum(wts))) {
-        ret <- TRUE
-      }
-    }
+    ret <- table_equiv(x, y)
   }
   ret
 }

@@ -2,10 +2,10 @@
 % Please edit documentation in R/features.r
 \name{clean_traj}
 \alias{clean_traj}
-\title{Clovis ADORIRR trajetory clean}
+\title{ADORIRR trajetory clean}
 \usage{
 clean_traj(x)
 }
 \description{
-Clovis ADORIRR trajetory clean
+ADORIRR trajetory clean
 }

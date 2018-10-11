@@ -1,18 +1,20 @@
 Package: ADaM
 Type: Package
 Title: Utilities for working with ADaM files
-Version: 0.1.0
+Version: 0.0.1
 Author: c(
   person("Michael", "Kane",
     role = c("aut", "cph", "cre"),
     email = "mkane@presagia.ai",
     comment = "http://orcid.org/0000-0003-1899-6662"
-    ))
+    ),
+  person("Brian", "Hobbs", 
+    role = c("aut", "aut"),
+    email = "bhobbs@presagia.ai")
 Description: A package for consolidating and processing ADaM files.
-Maintainer: Michael J. Kane <mkane@simulstat.com>
-License: LGPL-2
-Imports: tidyr, dplyr, foreach
-Suggests: knitr,
-    testthat
+Maintainer: Michael J. Kane <mkane@presagia.ai>
+License: Apache License 2.0
+Imports: tidyr, dplyr, foreach, lpSolve
+Suggests: knitr, testthat
 VignetteBuilder: knitr
 RoxygenNote: 6.1.0

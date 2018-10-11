@@ -4,12 +4,15 @@
 \alias{equiv}
 \title{Test to see if two vectors are equivalent.}
 \usage{
-equiv(x, y)
+equiv(x, y, factor_equiv_character = TRUE, ...)
 }
 \arguments{
 \item{x}{the first vector to test for equivalence.}
 
 \item{y}{the second vector to test for equivalence.}
+
+\item{factor_equiv_character}{should factors be treated as equivalend
+to characters? (default TRUE)}
 }
 \value{
 A boolean is returned indicating whether or not the two

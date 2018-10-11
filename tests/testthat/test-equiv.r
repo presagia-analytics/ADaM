@@ -12,7 +12,9 @@ b <- c("b", "b", "a", "c")
 # TRUE because they are the same (up to a label change).
 expect_true(equiv(a, b))
 
-expect_false(equiv(factor(a), b))
+expect_true(equiv(factor(a), b))
+
+expect_false(equiv(factor(a), b, factor_equiv_character = FALSE))
 
 expect_true(equiv(factor(a), factor(b)))
 

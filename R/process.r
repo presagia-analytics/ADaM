@@ -16,6 +16,7 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name) {
   }
   x %>% 
     remove_numerically_encoded_columns %>% 
+    remove_equiv_columns %>%
     collapse_rows(on, collapse_name) %>%
     mutate_if(is.character, as.factor)
 }
