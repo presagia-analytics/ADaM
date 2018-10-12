@@ -17,4 +17,5 @@ License: Apache License 2.0
 Imports: tidyr, dplyr, foreach
 Suggests: knitr, testthat
 VignetteBuilder: knitr
+Encoding: UTF-8
 RoxygenNote: 6.1.0
