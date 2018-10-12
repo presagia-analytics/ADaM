@@ -122,7 +122,8 @@ remove_numerically_encoded_columns <- function(x, verbose = FALSE) {
   nec <- numerically_encoded_cols(x)
   if (verbose) {
     if (length(nec) > 0) {
-      print(paste("Dropping numerically encoded columns", nec, collapse = " "))
+      print(paste("Dropping numerically encoded columns", 
+                  paste(nec, collapse = " ")))
     } else {
       print("No numerically encoded columns to drop.")
     }

@@ -53,22 +53,24 @@ equiv.numeric <- function(x, y, factor_equiv_character = TRUE, ...) {
 
 table_equiv <- function(x, y) {
   ret <- FALSE
-  x_nas <- which(is.na(x))
-  y_nas <- which(is.na(y))
-  if (length(x_nas) == length(y_nas) && isTRUE(all(x_nas == y_nas))) {
-    wts <- table(x, y)
-    row_all_zero_except_one <- apply(wts, 1, function(x) sum(x != 0) == 1)
-    col_all_zero_except_one <- apply(wts, 2, function(x) sum(x != 0) == 1)
-    if (isTRUE(all(row_all_zero_except_one)) && 
-        isTRUE(all(row_all_zero_except_one))) {
-    
-      row_non_zero <- sort(apply(wts, 1, function(x) which(x != 0)))
-      col_non_zero <- sort(apply(wts, 2, function(x) which(x != 0)))
+  if (length(x) == length(y) && length(unique(x)) == length(unique(y))) {
+    x_nas <- which(is.na(x))
+    y_nas <- which(is.na(y))
+    if (length(x_nas) == length(y_nas) && isTRUE(all(x_nas == y_nas))) {
+      wts <- as.matrix(table(x, y))
+      row_all_zero_except_one <- apply(wts, 1, function(x) sum(x != 0) == 1)
+      col_all_zero_except_one <- apply(wts, 2, function(x) sum(x != 0) == 1)
+      if (isTRUE(all(row_all_zero_except_one)) && 
+          isTRUE(all(row_all_zero_except_one))) {
 
-      if (isTRUE(all(row_non_zero == seq_along(row_non_zero))) &&
-          isTRUE(all(col_non_zero == seq_along(col_non_zero)))) {
-        
-        ret <- TRUE
+        row_non_zero <- sort(apply(wts, 1, function(z) which(z != 0)))
+        col_non_zero <- sort(apply(wts, 2, function(z) which(z != 0)))
+
+        if (isTRUE(all(row_non_zero == seq_along(row_non_zero))) &&
+            isTRUE(all(col_non_zero == seq_along(col_non_zero)))) {
+          
+          ret <- TRUE
+        }
       }
     }
   }
@@ -140,7 +142,7 @@ equiv_columns <- function(x) {
   }
   for (i in seq_len(ncol(x))[-ncol(x)]) {
     for (j in (i+1):ncol(x)) {
-      ret[i, j] <- equiv(as.vector(unlist(x[,i])), as.vector(unlist(x[,j])))
+      ret[i, j] <- equiv(as.data.frame(x)[,i], as.data.frame(x)[,j])
     }
   }
   ret
@@ -166,7 +168,7 @@ remove_equiv_columns <- function(x, verbose = FALSE) {
   if (verbose) {
     if (sum(redundant_cols) > 0) {
       print(paste("Dropping redundant columns", 
-                  colnames(x)[redundant_cols], collapse = " "))
+                  paste(colnames(x)[redundant_cols], collapse = " ")))
     } else {
       print("No redundant columns to drop.")
     }
