@@ -52,10 +52,12 @@ consolidate_adam <- function(..., on = "USUBJID") {
   }
 
   col_names <- list(colnames(arg_list[[1]]))
+  all_col_names <- unique(unlist(lapply(arg_list, colnames)))
+  all_col_names <- setdiff(all_col_names, colnames(arg_list[[1]]))
   for (i in 2:length(arg_list)) {
-    col_names <- c(col_names, 
-                   list(c(on, setdiff(colnames(arg_list[[i]]), 
-                                      colnames(arg_list[[i-1]])))))
+    keep_col_names <- intersect(colnames(arg_list[[i]]), all_col_names)
+    col_names <- c(col_names, list(c(on, keep_col_names)))
+    all_col_names <- setdiff(all_col_names, keep_col_names)
   }
   keep <- vapply(col_names, function(x) length(x) > 1, FALSE)
   col_names <- col_names[keep]

@@ -27,11 +27,20 @@ equiv <- function(x, y, factor_equiv_character = TRUE, ...) {
 
 #' @export
 equiv.default <- function(x, y, factor_equiv_character = TRUE, ...) {
-  if (class(x) == class(y)) { 
+  if (isTRUE(any(class(x) == class(y)))) { 
     warning(paste("Don't know how to test for equivalence between", 
                   class(x), "and", class(y)))
   }
   FALSE
+}
+
+#' @export
+equiv.Date <- function(x, y, factor_equiv_character = TRUE, ...) {
+  ret <- FALSE
+  if (inherits(y, "Date")) {
+    ret <- equiv(as.numeric(x), as.numeric(y))
+  }
+  ret
 }
 
 #' @export
