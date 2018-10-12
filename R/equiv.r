@@ -57,15 +57,24 @@ table_equiv <- function(x, y) {
   y_nas <- which(is.na(y))
   if (length(x_nas) == length(y_nas) && isTRUE(all(x_nas == y_nas))) {
     wts <- table(x, y)
-    if (nrow(wts) == ncol(wts) && 
-        all.equal(lp.assign(wts, "max")$objval, sum(wts))) {
-      ret <- TRUE
+    row_all_zero_except_one <- apply(wts, 1, function(x) sum(x != 0) == 1)
+    col_all_zero_except_one <- apply(wts, 2, function(x) sum(x != 0) == 1)
+    if (isTRUE(all(row_all_zero_except_one)) && 
+        isTRUE(all(row_all_zero_except_one))) {
+    
+      row_non_zero <- sort(apply(wts, 1, function(x) which(x != 0)))
+      col_non_zero <- sort(apply(wts, 2, function(x) which(x != 0)))
+
+      if (isTRUE(all(row_non_zero == seq_along(row_non_zero))) &&
+          isTRUE(all(col_non_zero == seq_along(col_non_zero)))) {
+        
+        ret <- TRUE
+      }
     }
   }
   ret
 }
 
-#' @importFrom lpSolve lp.assign
 #' @export
 equiv.character <- function(x, y, factor_equiv_character = TRUE, ...) {
   ret <- FALSE
@@ -131,7 +140,7 @@ equiv_columns <- function(x) {
   }
   for (i in seq_len(ncol(x))[-ncol(x)]) {
     for (j in (i+1):ncol(x)) {
-      ret[i, j] <- equiv(x[,i], x[,j])
+      ret[i, j] <- equiv(as.vector(unlist(x[,i])), as.vector(unlist(x[,j])))
     }
   }
   ret
@@ -142,6 +151,8 @@ equiv_columns <- function(x) {
 #' @description Find the equivalant columns of a data.frame. Keep the first 
 #' remove the rest.
 #' @param x a data.frame that may have repeated, equivalent columns.
+#' @param verbose should information about dropped columns be printed? 
+#' (default FALSE)
 #' @examples
 #' 
 #' iris$Sepal.Length2 <- 3 * iris$Sepal.Length + 3
@@ -149,9 +160,17 @@ equiv_columns <- function(x) {
 #' 
 #' @return a data frame where redundant columns have been dropeed.
 #' @export
-remove_equiv_columns <- function(x) {
+remove_equiv_columns <- function(x, verbose = FALSE) {
   ecm <- equiv_columns(x)
   redundant_cols <- apply(ecm, 2, any)
+  if (verbose) {
+    if (sum(redundant_cols) > 0) {
+      print(paste("Dropping redundant columns", 
+                  colnames(x)[redundant_cols], collapse = " "))
+    } else {
+      print("No redundant columns to drop.")
+    }
+  }
   x[,!redundant_cols]
 }
 

@@ -4,21 +4,27 @@
 #' @param x an ADaM formatted data.frame.
 #' @param on which variable should be collpased on? (Default: "USUBJID")
 #' @param collapse_name the variable name of the collapsed sub-data.frames.
+#' @param verbose should information about dropped columns be printed? 
+#' (default FALSE)
 #' @return The collapsed data.frame with numerically encoded columens removed.
 #' @examples
 #' data(adorirr)
 #' normalize_adam(adorirr)
 #' @importFrom dplyr %>% mutate_if
 #' @export
-normalize_adam <- function(x, on = "USUBJID", collapse_name) {
+normalize_adam <- function(x, on = "USUBJID", collapse_name, verbose = FALSE) {
   if (missing(collapse_name)) {
     collapse_name <- as.character(as.list(match.call())$x)
   }
+  to_factor <- function(x) {
+    col_types <- sapply(x, class)
+    to_factor <- colnames(x)[colnames(x) != on & col_types == "character"]
+  }
   x %>% 
-    remove_numerically_encoded_columns %>% 
-    remove_equiv_columns %>%
-    collapse_rows(on, collapse_name) %>%
-    mutate_if(is.character, as.factor)
+    remove_numerically_encoded_columns(verbose = verbose) %>% 
+    remove_equiv_columns(verbose = verbose) %>%
+    mutate_at(to_factor(.), as.factor) %>%
+    collapse_rows(on, collapse_name) 
 }
 
 #' Consolidate multiple data sets
@@ -107,11 +113,20 @@ numerically_encoded_cols <- function(x) {
 #' 
 #' @param x the ADaM formatted data.frame which may have numerically encoded
 #' columns.
+#' @param verbose do you want the columns being removed printed? (default FALSE)
 #' @examples
 #' data(adorirr)
 #' remove_numerically_encoded_columns(adorirr)
 #' @export
-remove_numerically_encoded_columns <- function(x) {
+remove_numerically_encoded_columns <- function(x, verbose = FALSE) {
+  nec <- numerically_encoded_cols(x)
+  if (verbose) {
+    if (length(nec) > 0) {
+      print(paste("Dropping numerically encoded columns", nec, collapse = " "))
+    } else {
+      print("No numerically encoded columns to drop.")
+    }
+  }
   x[, setdiff(colnames(x), numerically_encoded_cols(x))]
 }
 

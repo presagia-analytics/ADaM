@@ -4,11 +4,13 @@
 \alias{remove_numerically_encoded_columns}
 \title{Remove numerically encoded columns}
 \usage{
-remove_numerically_encoded_columns(x)
+remove_numerically_encoded_columns(x, verbose = FALSE)
 }
 \arguments{
 \item{x}{the ADaM formatted data.frame which may have numerically encoded
 columns.}
+
+\item{verbose}{do you want the columns being removed printed? (default FALSE)}
 }
 \description{
 Remove numerically encoded columns

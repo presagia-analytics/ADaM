@@ -14,7 +14,7 @@ Author: c(
 Description: A package for consolidating and processing ADaM files.
 Maintainer: Michael J. Kane <mkane@presagia.ai>
 License: Apache License 2.0
-Imports: tidyr, dplyr, foreach, lpSolve
+Imports: tidyr, dplyr, foreach
 Suggests: knitr, testthat
 VignetteBuilder: knitr
 RoxygenNote: 6.1.0

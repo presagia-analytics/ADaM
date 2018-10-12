@@ -4,7 +4,7 @@
 \alias{normalize_adam}
 \title{Normalize an ADam dataset.}
 \usage{
-normalize_adam(x, on = "USUBJID", collapse_name)
+normalize_adam(x, on = "USUBJID", collapse_name, verbose = FALSE)
 }
 \arguments{
 \item{x}{an ADaM formatted data.frame.}
@@ -12,6 +12,9 @@ normalize_adam(x, on = "USUBJID", collapse_name)
 \item{on}{which variable should be collpased on? (Default: "USUBJID")}
 
 \item{collapse_name}{the variable name of the collapsed sub-data.frames.}
+
+\item{verbose}{should information about dropped columns be printed? 
+(default FALSE)}
 }
 \value{
 The collapsed data.frame with numerically encoded columens removed.
