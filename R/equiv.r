@@ -52,6 +52,10 @@ equiv.numeric <- function(x, y, factor_equiv_character = TRUE, ...) {
     if (length(x_nas) == length(y_nas) && isTRUE(all(x_nas == y_nas))) {
       x <- na.omit(x)
       y <- na.omit(y)
+      if (length(unique(x)) == 1 || length(unique(y)) == 1) {
+        ret <- isTRUE(
+          all.equal(x, y, check.attributes = FALSE, use.names = FALSE))
+      }
       if (isTRUE(all.equal(abs(cor(x, y)), 1))) {
         ret <- TRUE
       }
