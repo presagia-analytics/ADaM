@@ -33,11 +33,6 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name, verbose = FALSE) {
 #' @param on which variable should be collpased on? (Default: "USUBJID")
 #' @return A single data.frame composed of the collapsed and merged input
 #' data.frames.
-#' @examples
-#' data(adorirr, adefirr, adsl)
-#' ruca <- list(normalize_adam(adorirr), normalize_adam(adefirr), 
-#'              normalize_adam(adsl))
-#' x <- consolidate_adam(ruca)
 #' @importFrom tidyr nest_
 #' @importFrom dplyr full_join
 #' @export
