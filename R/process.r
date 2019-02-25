@@ -88,12 +88,16 @@ collapse_rows <- function(x, key = "USUBJID", collapse_name = "data") {
   svs <- NULL
   sv <- c(key, collapsible_vars(x, key))
   nsv <- setdiff(colnames(x), sv)
-  sv_split <- split(seq_len(nrow(x)), Reduce(paste, x[,sv]))
-  foreach(svs = sv_split, .combine = rbind) %do% {
-    l <- list(x[svs, nsv])
-    ret <- x[svs[1], sv]
-    ret[[collapse_name]] <- l
-    ret
+  if(length(sv) == 1) {
+    x
+  } else {
+    sv_split <- split(seq_len(nrow(x)), Reduce(paste, x[,sv]))
+    foreach(svs = sv_split, .combine = rbind) %do% {
+      ret <- x[svs[1], sv]
+      l <- list(x[svs, nsv])
+      ret[[collapse_name]] <- l
+      ret
+    }
   }
 }
 
@@ -102,15 +106,19 @@ collapse_rows <- function(x, key = "USUBJID", collapse_name = "data") {
 #' @importFrom foreach foreach %do%
 collapsible_vars <- function(x, group_var) {
   s <- NULL
-  spl <- split(1:nrow(x), x[,group_var])
-  check_vars <- setdiff(colnames(x), group_var)
-  check_vals <- foreach (s = spl, .combine = `&`) %do% {
-    unlist(lapply(x[s, check_vars],
-      function(x) {
-        isTRUE(all(x == x[1])) | all(is.na(x))
-      }))
+  spl <- split(seq_len(nrow(x)), x[,group_var])
+  if (length(spl) == nrow(x)) {
+    character()
+  } else {
+    check_vars <- setdiff(colnames(x), group_var)
+    check_vals <- foreach (s = spl, .combine = `&`) %do% {
+      unlist(lapply(x[s, check_vars],
+        function(x) {
+          isTRUE(all(x == x[1])) | all(is.na(x))
+        }))
+    }
+    check_vars[check_vals]
   }
-  check_vars[check_vals]
 }
 
 # Find numerically encoded columns
