@@ -101,7 +101,6 @@ equiv.character <- function(x, y, factor_equiv_character = TRUE, ...) {
   ret
 }
 
-#' @importFrom lpSolve lp.assign
 #' @export
 equiv.factor <- function(x, y, factor_equiv_character = TRUE, ...) {
   ret <- FALSE
