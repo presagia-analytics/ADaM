@@ -18,9 +18,3 @@ data.frames.
 \description{
 Consolidate multiple data sets
 }
-\examples{
-data(adorirr, adefirr, adsl)
-ruca <- list(normalize_adam(adorirr), normalize_adam(adefirr), 
-             normalize_adam(adsl))
-x <- consolidate_adam(ruca)
-}

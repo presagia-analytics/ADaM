@@ -1,3 +1,15 @@
+#' Print a message
+#' 
+#' @param x the data the function will return
+#' @param msg the message to cat.
+#' @param verbose should the message be cat'ed? Default TRUE.
+#' @param ... other paramters passed to cat.
+tcat <- function(x, msg, verbose = TRUE, ...) {
+  if (verbose) {
+    cat(msg, ...)
+  }
+  x
+}
 
 #' Normalize an ADam dataset.
 #' 
@@ -21,9 +33,13 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name, verbose = FALSE) {
     to_factor <- colnames(x)[colnames(x) != on & col_types == "character"]
   }
   x %>% 
+    tcat("Removing numerically encoded columns.\n", verbose = verbose) %>%
     remove_numerically_encoded_columns(verbose = verbose) %>% 
+    tcat("Removing equivalent columns.\n", verbose = verbose) %>%
     remove_equiv_columns(verbose = verbose) %>%
+    tcat("Mutating character columns to factors.\n", verbose = verbose) %>%
     mutate_at(to_factor(.), as.factor) %>%
+    tcat("Collapsing rows.\n", verbose = verbose) %>%
     collapse_rows(on, collapse_name) 
 }
 
@@ -33,7 +49,6 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name, verbose = FALSE) {
 #' @param on which variable should be collpased on? (Default: "USUBJID")
 #' @return A single data.frame composed of the collapsed and merged input
 #' data.frames.
-#' @importFrom tidyr nest_
 #' @importFrom dplyr full_join
 #' @export
 consolidate_adam <- function(..., on = "USUBJID") {
@@ -72,15 +87,18 @@ consolidate_adam <- function(..., on = "USUBJID") {
 #' @examples
 #' data(adorirr)
 #' collapse_rows(adorirr)
-#' @importFrom tidyr nest_
+#' @importFrom foreach foreach %do%
 #' @export
 collapse_rows <- function(x, key = "USUBJID", collapse_name = "data") {
   sv <- c(key, collapsable_vars(x, key))
   nsv <- setdiff(colnames(x), sv)
-  if (length(nsv) > 0) {
-    x <- nest_(x, collapse_name, colnames(x)[match(nsv, colnames(x))])
+  sv_split <- split(seq_len(nrow(x)), Reduce(paste, x[,sv]))
+  foreach(svs = sv_split, .combine = rbind) %do% {
+    l <- list(x[svs, nsv])
+    ret <- x[svs[1], sv]
+    ret[[collapse_name]] <- l
+    ret
   }
-  x
 }
 
 # For data frames with repeated subject ids.
