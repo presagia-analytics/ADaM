@@ -15,7 +15,3 @@ columns.}
 \description{
 Remove numerically encoded columns
 }
-\examples{
-data(adorirr)
-remove_numerically_encoded_columns(adorirr)
-}

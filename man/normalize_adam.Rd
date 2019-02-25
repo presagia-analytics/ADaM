@@ -22,7 +22,3 @@ The collapsed data.frame with numerically encoded columens removed.
 \description{
 Normalize an ADam dataset.
 }
-\examples{
-data(adorirr)
-normalize_adam(adorirr)
-}

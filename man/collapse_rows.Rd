@@ -16,7 +16,3 @@ collapse_rows(x, key = "USUBJID", collapse_name = "data")
 \description{
 Collapse the rows of a data.frame object
 }
-\examples{
-data(adorirr)
-collapse_rows(adorirr)
-}

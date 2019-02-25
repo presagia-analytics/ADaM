@@ -19,12 +19,10 @@ tcat <- function(x, msg, verbose = TRUE, ...) {
 #' @param verbose should information about dropped columns be printed? 
 #' (default FALSE)
 #' @return The collapsed data.frame with numerically encoded columens removed.
-#' @examples
-#' data(adorirr)
-#' normalize_adam(adorirr)
-#' @importFrom dplyr %>% mutate_if
+#' @importFrom dplyr %>% mutate_if mutate_at
 #' @export
 normalize_adam <- function(x, on = "USUBJID", collapse_name, verbose = FALSE) {
+  . <- NULL
   if (missing(collapse_name)) {
     collapse_name <- as.character(as.list(match.call())$x)
   }
@@ -84,13 +82,11 @@ consolidate_adam <- function(..., on = "USUBJID") {
 #' @param x and ADaM formatted data.frame
 #' @param key which variable should be collpased on? (Default: "USUBJID")
 #' @param collapse_name the variable name of the collapsed sub-data.frames.
-#' @examples
-#' data(adorirr)
-#' collapse_rows(adorirr)
 #' @importFrom foreach foreach %do%
 #' @export
 collapse_rows <- function(x, key = "USUBJID", collapse_name = "data") {
-  sv <- c(key, collapsable_vars(x, key))
+  svs <- NULL
+  sv <- c(key, collapsible_vars(x, key))
   nsv <- setdiff(colnames(x), sv)
   sv_split <- split(seq_len(nrow(x)), Reduce(paste, x[,sv]))
   foreach(svs = sv_split, .combine = rbind) %do% {
@@ -104,7 +100,8 @@ collapse_rows <- function(x, key = "USUBJID", collapse_name = "data") {
 # For data frames with repeated subject ids.
 
 #' @importFrom foreach foreach %do%
-collapsable_vars <- function(x, group_var) {
+collapsible_vars <- function(x, group_var) {
+  s <- NULL
   spl <- split(1:nrow(x), x[,group_var])
   check_vars <- setdiff(colnames(x), group_var)
   check_vals <- foreach (s = spl, .combine = `&`) %do% {
@@ -129,9 +126,6 @@ numerically_encoded_cols <- function(x) {
 #' @param x the ADaM formatted data.frame which may have numerically encoded
 #' columns.
 #' @param verbose do you want the columns being removed printed? (default FALSE)
-#' @examples
-#' data(adorirr)
-#' remove_numerically_encoded_columns(adorirr)
 #' @export
 remove_numerically_encoded_columns <- function(x, verbose = FALSE) {
   nec <- numerically_encoded_cols(x)

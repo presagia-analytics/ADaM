@@ -3,6 +3,7 @@
 #' @importFrom dplyr %>% arrange
 #' @export
 clean_traj <- function(x) {
+  ADY <- NULL
   ret <- x[as.numeric(x$AVALC) < 5 , c("ADY", "AVALC")] %>%
     arrange(ADY) %>%
     na.omit

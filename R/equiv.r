@@ -43,6 +43,7 @@ equiv.Date <- function(x, y, factor_equiv_character = TRUE, ...) {
   ret
 }
 
+#' @importFrom stats cor
 #' @export
 equiv.numeric <- function(x, y, factor_equiv_character = TRUE, ...) {
   ret <- FALSE
@@ -114,7 +115,7 @@ equiv.factor <- function(x, y, factor_equiv_character = TRUE, ...) {
 }
 
 #' @export
-equiv.tibble <- function(x, y) {
+equiv.tibble <- function(x, y, factor_equiv_character = TRUE, ...) {
   ret <- FALSE
   if (ncol(x) == 1) {
     x <- as.vector(x[,1])
