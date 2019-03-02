@@ -109,7 +109,10 @@ equiv.factor <- function(x, y, factor_equiv_character = TRUE, ...) {
     y <- as.factor(y)
   }
   if (is.factor(y)) {
-    ret <- table_equiv(x, y)
+    if (isTRUE(length(levels(x)) == length(levels(y)) && 
+        all(levels(x) == levels(y)))) {
+      ret <- table_equiv(x, y)
+    }
   }
   ret
 }
