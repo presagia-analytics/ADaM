@@ -90,28 +90,20 @@ consolidate_adam <- function(..., on = "USUBJID") {
 #' @param x and ADaM formatted data.frame
 #' @param key which variable should be collpased on? (Default: "USUBJID")
 #' @param collapse_name the variable name of the collapsed sub-data.frames.
-#' @importFrom foreach foreach %do%
+#' @importFrom tidyr nest_
 #' @export
 collapse_rows <- function(x, key = "USUBJID", collapse_name = "data") {
   svs <- NULL
   sv <- c(key, collapsible_vars(x, key))
   nsv <- setdiff(colnames(x), sv)
-  sv_split <- split(seq_len(nrow(x)), Reduce(paste, x[,sv]))
-  if (length(sv_split) < nrow(x)) {
-    foreach(svs = sv_split, .combine = rbind) %do% {
-      ret <- x[svs[1], sv]
-      l <- list(x[svs, nsv])
-      ret[[collapse_name]] <- l
-      ret
-    }
-  } else {
-    x
+  if (length(nsv) > 0 && length(unique(x[[key]])) < nrow(x)) {
+    x <- nest_(x, collapse_name, colnames(x)[match(nsv, colnames(x))])
   }
+  x
 }
 
 # For data frames with repeated subject ids.
 
-#' @importFrom foreach foreach %do%
 collapsible_vars <- function(x, group_var) {
   s <- NULL
   spl <- split(seq_len(nrow(x)), x[,group_var])
@@ -119,12 +111,13 @@ collapsible_vars <- function(x, group_var) {
     character()
   } else {
     check_vars <- setdiff(colnames(x), group_var)
-    check_vals <- foreach (s = spl, .combine = `&`) %do% {
-      unlist(lapply(x[s, check_vars],
-        function(x) {
-          isTRUE(all(x == x[1])) | all(is.na(x))
-        }))
-    }
+    check_vals <- Reduce(`&`, 
+      Map(function(s) {
+            unlist(lapply(x[s, check_vars],
+              function(x) {
+                isTRUE(all(x == x[1])) | all(is.na(x))
+              }))
+          }, spl))
     check_vars[check_vals]
   }
 }
