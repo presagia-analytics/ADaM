@@ -1,7 +1,7 @@
 Package: ADaM
 Type: Package
 Title: Utilities for working with ADaM files
-Version: 0.0.6
+Version: 0.0.7
 Author: c(
   person("Michael", "Kane",
     role = c("aut", "cph", "cre"),
