@@ -13,6 +13,8 @@ equiv(x, y, factor_equiv_character = TRUE, ...)
 
 \item{factor_equiv_character}{should factors be treated as equivalend
 to characters? (default TRUE)}
+
+\item{...}{other arguments for type-specific equivalence.}
 }
 \value{
 A boolean is returned indicating whether or not the two

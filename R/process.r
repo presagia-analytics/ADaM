@@ -3,10 +3,12 @@
 #' @param x the data the function will return
 #' @param msg the message to cat.
 #' @param verbose should the message be cat'ed? Default TRUE.
+#' @param style the crayon style to use when printing. Default reset.
 #' @param ... other paramters passed to cat.
-tcat <- function(x, msg, verbose = TRUE, ...) {
+#' @importFrom crayon reset
+tcat <- function(x, msg, verbose = TRUE, style = reset, ...) {
   if (verbose) {
-    cat(msg, ...)
+    cat(style(msg), ...)
   }
   x
 }
@@ -20,6 +22,7 @@ tcat <- function(x, msg, verbose = TRUE, ...) {
 #' (default FALSE)
 #' @return The collapsed data.frame with numerically encoded columens removed.
 #' @importFrom dplyr %>% mutate_if mutate_at
+#' @importFrom crayon green
 #' @export
 normalize_adam <- function(x, on = "USUBJID", collapse_name, verbose = FALSE) {
   . <- NULL
@@ -31,13 +34,16 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name, verbose = FALSE) {
     to_factor <- colnames(x)[colnames(x) != on & col_types == "character"]
   }
   x %>% 
-    tcat("Removing numerically encoded columns.\n", verbose = verbose) %>%
+    tcat("Removing numerically encoded columns.\n", verbose = verbose,
+         style = green) %>%
     remove_numerically_encoded_columns(verbose = verbose) %>% 
-    tcat("Removing equivalent columns.\n", verbose = verbose) %>%
+    tcat("Removing equivalent columns.\n", verbose = verbose,
+         style = green) %>%
     remove_equiv_columns(verbose = verbose) %>%
-    tcat("Mutating character columns to factors.\n", verbose = verbose) %>%
+    tcat("Mutating character columns to factors.\n", verbose = verbose,
+         style = green) %>%
     mutate_at(to_factor(.), as.factor) %>%
-    tcat("Collapsing rows.\n", verbose = verbose) %>%
+    tcat("Collapsing rows.\n", verbose = verbose, style = green) %>%
     collapse_rows(on, collapse_name) 
 }
 
@@ -48,6 +54,7 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name, verbose = FALSE) {
 #' @return A single data.frame composed of the collapsed and merged input
 #' data.frames.
 #' @importFrom dplyr full_join
+#' @importFrom crayon red
 #' @export
 consolidate_adam <- function(..., on = "USUBJID") {
   # Get the set of data sets.
@@ -56,7 +63,8 @@ consolidate_adam <- function(..., on = "USUBJID") {
   # Make sure we have an on variable in each data set.
   name_check <- vapply(arg_list, function(x) on %in% names(x), FALSE)
   if (!isTRUE(all(name_check))) {
-    stop(paste("Join variable missing in data set", which(name_check != TRUE)))
+    stop(red(
+      paste("Join variable missing in data set", which(name_check != TRUE))))
   }
 
   col_names <- list(colnames(arg_list[[1]]))
@@ -88,16 +96,16 @@ collapse_rows <- function(x, key = "USUBJID", collapse_name = "data") {
   svs <- NULL
   sv <- c(key, collapsible_vars(x, key))
   nsv <- setdiff(colnames(x), sv)
-  if(length(sv) == 1) {
-    x
-  } else {
-    sv_split <- split(seq_len(nrow(x)), Reduce(paste, x[,sv]))
+  sv_split <- split(seq_len(nrow(x)), Reduce(paste, x[,sv]))
+  if (length(sv_split) < nrow(x)) {
     foreach(svs = sv_split, .combine = rbind) %do% {
       ret <- x[svs[1], sv]
       l <- list(x[svs, nsv])
       ret[[collapse_name]] <- l
       ret
     }
+  } else {
+    x
   }
 }
 
@@ -147,5 +155,4 @@ remove_numerically_encoded_columns <- function(x, verbose = FALSE) {
   }
   x[, setdiff(colnames(x), numerically_encoded_cols(x))]
 }
-
 

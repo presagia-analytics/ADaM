@@ -8,6 +8,7 @@
 #' @param y the second vector to test for equivalence.
 #' @param factor_equiv_character should factors be treated as equivalend
 #' to characters? (default TRUE)
+#' @param ... other arguments for type-specific equivalence.
 #' @return A boolean is returned indicating whether or not the two
 #' vectors are equivalent.
 #' @examples
@@ -25,11 +26,12 @@ equiv <- function(x, y, factor_equiv_character = TRUE, ...) {
   UseMethod("equiv")
 }
 
+#' @importFrom crayon yellow
 #' @export
 equiv.default <- function(x, y, factor_equiv_character = TRUE, ...) {
   if (isTRUE(any(class(x) == class(y)))) { 
-    warning(paste("Don't know how to test for equivalence between", 
-                  class(x), "and", class(y)))
+    warning(yellow(paste("Don't know how to test for equivalence between", 
+                  class(x), "and", class(y))))
   }
   FALSE
 }
@@ -182,10 +184,10 @@ remove_equiv_columns <- function(x, verbose = FALSE) {
   redundant_cols <- apply(ecm, 2, any)
   if (verbose) {
     if (sum(redundant_cols) > 0) {
-      print(paste("Dropping redundant columns", 
-                  paste(colnames(x)[redundant_cols], collapse = " ")))
+      cat(green(paste("Dropping redundant columns", 
+                  paste(colnames(x)[redundant_cols], collapse = " ")), "\n"))
     } else {
-      print("No redundant columns to drop.")
+      cat(green("No redundant columns to drop.\n"))
     }
   }
   x[,!redundant_cols]
