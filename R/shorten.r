@@ -95,10 +95,27 @@ shorten_colnames <- function(x, cols = seq_along(x), sep = " ",
                     collapse = "")))
   }
   colnames(x)[cols] <- sc$short_string
+  sc$cols <- cols
   if (is.null(attributes(x)$name_map)) {
     attributes(x)$name_map <- sc
   } else {
     attributes(x)$name_map <- rbind(attributes(x)$name_map, sc)
   }
   x
+}
+
+#' Get the Map of Shortened Names to Original Names
+#'
+#' @param the data.frame to get the name map from.
+#' @return if the name map exists, then the return is a tibble where the
+#' column "string" is the original column name and "short_string" is the
+#' shortened column name.
+#' @export
+name_map <- function(x) {
+  nm <- attributes(x)$name_map
+  if (is.null(nm)) {
+    tibble(string = character(), short_string = character(), cols = integer())
+  } else {
+    nm
+  }
 }
