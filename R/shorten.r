@@ -31,7 +31,7 @@ cat_string <- function(x, min_len, max_len, max_total, outsep) {
 #' @param sep the string separators. Default " ".
 #' @param outsep the shortened string separator. Default "_".
 #' @param cruft_patter the regex desribing the characters that will be dropped
-#' from all string.
+#' from the string.
 #' @export
 shorten_string <- function(x, min_len = 3, max_len = 10, max_total = 18, 
   sep = " ", outsep = "_", cruft_pattern = "[aeiou\\-]") {
@@ -48,9 +48,12 @@ shorten_string <- function(x, min_len = 3, max_len = 10, max_total = 18,
 #'
 #' @param x a vector of characters.
 #' @param sep the string separators. Default " ".
+#' @param cruft_pattern the regex desribing the characters that will be dropped
+#' from the string.
 #' @export
-shorten_acronym <- function(x, sep = " ") {
+shorten_acronym <- function(x, sep = " ", cruft_pattern = "[^a-zA-Z0-9 \\.]") {
   string <- x
+  x <- gsub(cruft_pattern, "", x)
   ss <- strsplit(x, split = sep)
   short_string <- 
     unlist(lapply(ss,
@@ -92,6 +95,10 @@ shorten_colnames <- function(x, cols = seq_along(x), sep = " ",
                     collapse = "")))
   }
   colnames(x)[cols] <- sc$short_string
-  attributes(x)$name_map <- c(attributes(x)$name_map, sc)
+  if (is.null(attributes(x)$name_map)) {
+    attributes(x)$name_map <- sc
+  } else {
+    attributes(x)$name_map <- rbind(attributes(x)$name_map, sc)
+  }
   x
 }
