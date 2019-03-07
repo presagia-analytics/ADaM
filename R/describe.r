@@ -26,6 +26,7 @@ attr_or_na <- function(x, attr) {
 #' a column, data_name is added and the value is repeated. Otherwise,
 #' a new column is not added. Default NULL.
 #' @return A tibble with description information.
+#' @importFrom tibble tibble
 #' @export
 describe_adam <- function(x, data_name = NULL) {
   ret <- tibble(var_name = colnames(x))

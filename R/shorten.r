@@ -32,6 +32,7 @@ cat_string <- function(x, min_len, max_len, max_total, outsep) {
 #' @param outsep the shortened string separator. Default "_".
 #' @param cruft_patter the regex desribing the characters that will be dropped
 #' from the string.
+#' @importFrom tibble tibble
 #' @export
 shorten_string <- function(x, min_len = 3, max_len = 10, max_total = 18, 
   sep = " ", outsep = "_", cruft_pattern = "[aeiou\\-]") {
@@ -50,6 +51,7 @@ shorten_string <- function(x, min_len = 3, max_len = 10, max_total = 18,
 #' @param sep the string separators. Default " ".
 #' @param cruft_pattern the regex desribing the characters that will be dropped
 #' from the string.
+#' @importFrom tibble tibble
 #' @export
 shorten_acronym <- function(x, sep = " ", cruft_pattern = "[^a-zA-Z0-9 \\.]") {
   string <- x
@@ -110,6 +112,7 @@ shorten_colnames <- function(x, cols = seq_along(x), sep = " ",
 #' @return if the name map exists, then the return is a tibble where the
 #' column "string" is the original column name and "short_string" is the
 #' shortened column name.
+#' @importFrom tibble tibble
 #' @export
 name_map <- function(x) {
   nm <- attributes(x)$name_map
