@@ -1,5 +1,14 @@
 
 cat_string <- function(x, min_len, max_len, max_total, outsep) {
+  if (any(is.na(x))) {
+    if (sum(is.na(x)) < length(x)) {
+      warning(
+        yellow("\ncat_string: argument x has NA's. Dropping all occurences"))
+      x <- x[!is.na(x)]
+    } else {
+      stop(red("\ncat_string: argument consists only of NA's."))
+    }
+  }
   if (max_total < max_len) {
     warning(yellow(paste0( "max_total is less than max_len. ",
                            "Setting max_total to max_len.")))
