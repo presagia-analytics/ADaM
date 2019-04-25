@@ -23,7 +23,7 @@ Default 18.}
 
 \item{outsep}{the shortened string separator. Default "_".}
 
-\item{cruft_patter}{the regex desribing the characters that will be dropped
+\item{cruft_pattern}{the regex desribing the characters that will be dropped
 from the string.}
 }
 \description{

@@ -7,7 +7,7 @@
 name_map(x)
 }
 \arguments{
-\item{the}{data.frame to get the name map from.}
+\item{x}{the data.frame to get the name map from.}
 }
 \value{
 if the name map exists, then the return is a tibble where the

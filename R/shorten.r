@@ -1,4 +1,5 @@
 
+#' @importFrom crayon yellow
 cat_string <- function(x, min_len, max_len, max_total, outsep) {
   if (any(is.na(x))) {
     if (sum(is.na(x)) < length(x)) {
@@ -39,7 +40,7 @@ cat_string <- function(x, min_len, max_len, max_total, outsep) {
 #' Default 18.
 #' @param sep the string separators. Default " ".
 #' @param outsep the shortened string separator. Default "_".
-#' @param cruft_patter the regex desribing the characters that will be dropped
+#' @param cruft_pattern the regex desribing the characters that will be dropped
 #' from the string.
 #' @importFrom tibble tibble
 #' @export
@@ -76,9 +77,10 @@ shorten_acronym <- function(x, sep = " ", cruft_pattern = "[^a-zA-Z0-9 \\.]") {
 
 #' Shorten Column Names of data.frame
 #'
-#' @param the data.frame whose columnames should shortened.
+#' @param x the data.frame whose columnames should be shortened.
 #' @param cols the column names to shorten. Can be integer denoting which
 #' columns or character indicating the column names.
+#' @param sep the shortened name separator.
 #' @param method how should the string be shortened. Can be either 
 #' shorten_string or shorten_acronym. Default shorten_string.
 #' @param ... other parameters to be passed to method.
@@ -117,7 +119,7 @@ shorten_colnames <- function(x, cols = seq_along(x), sep = " ",
 
 #' Get the Map of Shortened Names to Original Names
 #'
-#' @param the data.frame to get the name map from.
+#' @param x the data.frame to get the name map from.
 #' @return if the name map exists, then the return is a tibble where the
 #' column "string" is the original column name and "short_string" is the
 #' shortened column name.

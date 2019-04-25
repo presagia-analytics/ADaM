@@ -8,15 +8,17 @@ shorten_colnames(x, cols = seq_along(x), sep = " ",
   method = shorten_string, ...)
 }
 \arguments{
+\item{x}{the data.frame whose columnames should be shortened.}
+
 \item{cols}{the column names to shorten. Can be integer denoting which
 columns or character indicating the column names.}
+
+\item{sep}{the shortened name separator.}
 
 \item{method}{how should the string be shortened. Can be either 
 shorten_string or shorten_acronym. Default shorten_string.}
 
 \item{...}{other parameters to be passed to method.}
-
-\item{the}{data.frame whose columnames should shortened.}
 }
 \description{
 Shorten Column Names of data.frame

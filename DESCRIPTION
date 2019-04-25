@@ -7,14 +7,11 @@ Author: c(
     role = c("aut", "cph", "cre"),
     email = "mkane@presagia.ai",
     comment = "http://orcid.org/0000-0003-1899-6662"
-    ),
-  person("Brian", "Hobbs", 
-    role = c("aut", "aut"),
-    email = "bhobbs@presagia.ai")
+    ))
 Description: A package for consolidating and processing ADaM files.
 Maintainer: Michael J. Kane <mkane@presagia.ai>
 License: Apache License 2.0
-Imports: dplyr, tidyr, crayon, tibble
+Imports: dplyr, tidyr, crayon, tibble, equivalent
 Suggests: knitr, testthat
 VignetteBuilder: knitr
 Encoding: UTF-8
