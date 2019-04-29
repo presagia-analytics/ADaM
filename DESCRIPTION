@@ -11,7 +11,7 @@ Author: c(
 Description: A package for consolidating and processing ADaM files.
 Maintainer: Michael J. Kane <mkane@presagia.ai>
 License: Apache License 2.0
-Imports: dplyr, tidyr, crayon, tibble, equivalent, normalizer
+Imports: dplyr, tidyr, crayon, tibble, equivalent, normalizer, cli
 Suggests: knitr, testthat
 VignetteBuilder: knitr
 Encoding: UTF-8

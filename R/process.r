@@ -40,7 +40,7 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name,
   }
   to_factor <- function(x) {
     col_types <- sapply(x, class)
-    to_factor <- colnames(x)[colnames(x) != on & col_types == "character"]
+    colnames(x)[colnames(x) != on & col_types == "character"]
   }
 
   if (remove_numerically_encoded) {
@@ -55,9 +55,21 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name,
            style = green) %>%
       remove_equiv_columns(verbose = verbose, keep_cols = keep_cols)
   }
+ 
+  if (verbose) { 
+    cat(green("Mutating character columns to factors.\n"))
+    ma <- to_factor(x)
+    if (length(ma) == 0) {
+      cat(italic("No variables to turn into factor."))
+    } else {
+      cat(
+        italic("\tThe following variables will be turned into factors:\n\t\t"))
+      cat(italic(paste(ma, collapse = "\n\t\t")))
+      cat("\n")
+    }
+  }
+
   x %>%
-    tcat("Mutating character columns to factors.\n", verbose = verbose,
-         style = green) %>%
     mutate_at(to_factor(.), as.factor) %>%
     tcat("Collapsing rows.\n", verbose = verbose, style = green) %>%
     collapse_rows(on, collapse_name) 
@@ -114,15 +126,16 @@ numerically_encoded_cols <- function(x) {
 #' @param x the ADaM formatted data.frame which may have numerically encoded
 #' columns.
 #' @param verbose do you want the columns being removed printed? (default FALSE)
+#' @importFrom crayon italic
 #' @export
 remove_numerically_encoded_columns <- function(x, verbose = FALSE) {
   nec <- numerically_encoded_cols(x)
   if (verbose) {
     if (length(nec) > 0) {
-      print(paste("Dropping numerically encoded columns", 
-                  paste(nec, collapse = " ")))
+      cat(italic("\tDropping numerically encoded columns:\n\t\t", 
+                 paste(nec, collapse = "\n\t\t"), "\n", sep = ""))
     } else {
-      print("No numerically encoded columns to drop.")
+      cat(italic("\tNo numerically encoded columns to drop.\n"))
     }
   }
   x[, setdiff(colnames(x), numerically_encoded_cols(x))]
