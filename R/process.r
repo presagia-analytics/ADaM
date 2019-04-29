@@ -18,14 +18,22 @@ tcat <- function(x, msg, verbose = TRUE, style = reset, ...) {
 #' @param x an ADaM formatted data.frame.
 #' @param on which variable should be collpased on? (Default: "USUBJID")
 #' @param collapse_name the variable name of the collapsed sub-data.frames.
+#' @param remove_equiv_columns should equivalent columns be removed?
+#' @param remove_numerically_encoded should numerically encoded columns be 
+#' removed? Default TRUE
+#' @param keep_cols column names that should be kept.
 #' @param verbose should information about dropped columns be printed? 
 #' (default FALSE)
 #' @return The collapsed data.frame with numerically encoded columens removed.
 #' @importFrom dplyr %>% mutate_if mutate_at
 #' @importFrom crayon green
 #' @importFrom equivalent remove_equiv_columns
+#' @importFrom normalizer collapse_rows
 #' @export
-normalize_adam <- function(x, on = "USUBJID", collapse_name, verbose = FALSE) {
+normalize_adam <- function(x, on = "USUBJID", collapse_name, 
+  remove_equiv_columns = TRUE, remove_numerically_encoded = TRUE,
+  keep_cols = character(), verbose = FALSE) {
+
   . <- NULL
   if (missing(collapse_name)) {
     collapse_name <- as.character(as.list(match.call())$x)
@@ -34,13 +42,20 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name, verbose = FALSE) {
     col_types <- sapply(x, class)
     to_factor <- colnames(x)[colnames(x) != on & col_types == "character"]
   }
-  x %>% 
-    tcat("Removing numerically encoded columns.\n", verbose = verbose,
-         style = green) %>%
-    remove_numerically_encoded_columns(verbose = verbose) %>% 
-    tcat("Removing equivalent columns.\n", verbose = verbose,
-         style = green) %>%
-    remove_equiv_columns(verbose = verbose) %>%
+
+  if (remove_numerically_encoded) {
+    x <- x %>% 
+      tcat("Removing numerically encoded columns.\n", verbose = verbose,
+           style = green) %>%
+      remove_numerically_encoded_columns(verbose = verbose)
+  }
+  if (remove_equiv_columns) {
+    x %>%
+      tcat("Removing equivalent columns.\n", verbose = verbose,
+           style = green) %>%
+      remove_equiv_columns(verbose = verbose, keep_cols = keep_cols)
+  }
+  x %>%
     tcat("Mutating character columns to factors.\n", verbose = verbose,
          style = green) %>%
     mutate_at(to_factor(.), as.factor) %>%
@@ -84,43 +99,6 @@ consolidate_adam <- function(..., on = "USUBJID") {
     ret <- full_join(ret, arg_list[[i]][,col_names[[i]]], by = on)
   }
   ret
-}
-
-#' Collapse the rows of a data.frame object
-#' 
-#' @param x and ADaM formatted data.frame
-#' @param key which variable should be collpased on? (Default: "USUBJID")
-#' @param collapse_name the variable name of the collapsed sub-data.frames.
-#' @importFrom tidyr nest_
-#' @export
-collapse_rows <- function(x, key = "USUBJID", collapse_name = "data") {
-  svs <- NULL
-  sv <- c(key, collapsible_vars(x, key))
-  nsv <- setdiff(colnames(x), sv)
-  if (length(nsv) > 0 && length(unique(x[[key]])) < nrow(x)) {
-    x <- nest_(x, collapse_name, colnames(x)[match(nsv, colnames(x))])
-  }
-  x
-}
-
-# For data frames with repeated subject ids.
-
-collapsible_vars <- function(x, group_var) {
-  s <- NULL
-  spl <- split(seq_len(nrow(x)), x[,group_var])
-  if (length(spl) == nrow(x)) {
-    character()
-  } else {
-    check_vars <- setdiff(colnames(x), group_var)
-    check_vals <- Reduce(`&`, 
-      Map(function(s) {
-            unlist(lapply(x[s, check_vars],
-              function(x) {
-                isTRUE(all(x == x[1])) | all(is.na(x))
-              }))
-          }, spl))
-    check_vars[check_vals]
-  }
 }
 
 # Find numerically encoded columns
