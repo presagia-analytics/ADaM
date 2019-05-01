@@ -74,6 +74,27 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name,
     collapse_rows(on, collapse_name) 
 }
 
+#' @importFrom crayon red
+#' @importFrom equivalent equiv
+check_common_variable_equivalence <- function(x, on) {
+  dup_violations <- c()
+  if (length(x) > 1) {
+    all_names <- unlist(lapply(x, colnames))
+    dup_names <- setdiff(all_names[duplicated(all_names)], on)
+    for (dn in dup_names) {
+      dup_inds <- which(unlist(lapply(x, function(d) dn %in% colnames(d))))
+      for (di in dup_inds[-1]) {
+        if (!equiv(x[[dup_inds[1]]][[dn]][order(x[[dup_inds[1]]][[on]])], 
+                   x[[di]][[dn]][order(x[[dup_inds[1]]][[on]])])) {
+          dup_violations <- c(dup_violations, dn)
+          break
+        }
+      }
+    }
+  }
+  dup_violations
+}
+
 #' Consolidate multiple data sets
 #'
 #' @param ... a set of ADaM formatted data.frames.
@@ -92,6 +113,16 @@ consolidate_adam <- function(..., on = "USUBJID") {
   if (!isTRUE(all(name_check))) {
     stop(red(
       paste("Join variable missing in data set", which(name_check != TRUE))))
+  }
+
+  # Make sure if a variable appears in more than one data set it is the 
+  # same in each data set.
+  violations <- check_common_variable_equivalence(arg_list, on = on)
+  if (length(violations) > 0) {
+    stop(red("The following variables appear in multiple data sets but are ",
+             "not consistent\n  and can't be merged:\n\t", 
+             paste(violations, collapse= "\n\t"), 
+             sep = ""))
   }
 
   col_names <- list(colnames(arg_list[[1]]))
