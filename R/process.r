@@ -74,9 +74,14 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name,
     collapse_rows(on, collapse_name) 
 }
 
+#' Test for Variable Equivence in a list of data.frames
+#'
+#' @param x the list of data.frames.
+#' @param on the collapse variable.
 #' @importFrom crayon red
 #' @importFrom equivalent equiv
-check_common_variable_equivalence <- function(x, on) {
+#' @export
+var_equiv_violation <- function(x, on) {
   dup_violations <- c()
   if (length(x) > 1) {
     dup_names <- setdiff(dup_vars(x), on)
@@ -100,7 +105,7 @@ check_common_variable_equivalence <- function(x, on) {
 #' @export
 dup_vars <- function(x) {
   all_names <- unlist(lapply(x, colnames))
-  all_names[duplicated(all_names)]
+  unique(all_names[duplicated(all_names)])
 }
 
 #' Consolidate multiple data sets
@@ -125,7 +130,7 @@ consolidate_adam <- function(..., on = "USUBJID") {
 
   # Make sure if a variable appears in more than one data set it is the 
   # same in each data set.
-  violations <- check_common_variable_equivalence(arg_list, on = on)
+  violations <- var_equiv_violation(arg_list, on = on)
   if (length(violations) > 0) {
     stop(red("The following variables appear in multiple data sets but are ",
              "not consistent\n  and can't be merged:\n\t", 
