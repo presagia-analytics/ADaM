@@ -79,8 +79,7 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name,
 check_common_variable_equivalence <- function(x, on) {
   dup_violations <- c()
   if (length(x) > 1) {
-    all_names <- unlist(lapply(x, colnames))
-    dup_names <- setdiff(all_names[duplicated(all_names)], on)
+    dup_names <- setdiff(dup_vars(x), on)
     for (dn in dup_names) {
       dup_inds <- which(unlist(lapply(x, function(d) dn %in% colnames(d))))
       for (di in dup_inds[-1]) {
@@ -93,6 +92,15 @@ check_common_variable_equivalence <- function(x, on) {
     }
   }
   dup_violations
+}
+
+#' Variables Duplicated Across Data Sets
+#'
+#' @param x the list of data.frames.
+#' @export
+dup_vars <- function(x) {
+  all_names <- unlist(lapply(x, colnames))
+  all_names[duplicated(all_names)]
 }
 
 #' Consolidate multiple data sets

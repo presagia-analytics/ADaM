@@ -3,6 +3,7 @@
 export(consolidate_adam)
 export(consolidated_describe_adam)
 export(describe_adam)
+export(dup_vars)
 export(normalize_adam)
 export(remove_numerically_encoded_columns)
 importFrom(crayon,green)
