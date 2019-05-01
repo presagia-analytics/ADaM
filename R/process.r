@@ -27,8 +27,7 @@ tcat <- function(x, msg, verbose = TRUE, style = reset, ...) {
 #' @return The collapsed data.frame with numerically encoded columens removed.
 #' @importFrom dplyr %>% mutate_if mutate_at
 #' @importFrom crayon green
-#' @importFrom equivalent remove_equiv_columns
-#' @importFrom normalizer collapse_rows
+#' @importFrom normalizer collapse_rows remove_equiv_columns
 #' @export
 normalize_adam <- function(x, on = "USUBJID", collapse_name, 
   remove_equiv_columns = TRUE, remove_numerically_encoded = TRUE,
