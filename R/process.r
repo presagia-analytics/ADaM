@@ -183,7 +183,7 @@ consolidate_adam <- function(..., on = "USUBJID", verbose = FALSE) {
 
   if (length(rvs) > 0) {
     if (verbose) {
-      cat(italic("Handling repeated variables."))
+      cat(italic("\tHandling repeated variables."))
     }
     arg_list <- handle_repeated_vars(arg_list, rvs, on)
   }  
