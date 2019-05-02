@@ -4,12 +4,14 @@
 \alias{consolidate_adam}
 \title{Consolidate multiple data sets}
 \usage{
-consolidate_adam(..., on = "USUBJID")
+consolidate_adam(..., on = "USUBJID", verbose = FALSE)
 }
 \arguments{
 \item{...}{a set of ADaM formatted data.frames.}
 
 \item{on}{which variable should be collpased on? (Default: "USUBJID")}
+
+\item{verbose}{should extra information be provided? (Default: TRUE)}
 }
 \value{
 A single data.frame composed of the collapsed and merged input

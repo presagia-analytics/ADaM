@@ -74,27 +74,39 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name,
     collapse_rows(on, collapse_name) 
 }
 
-#' Test for Variable Equivence in a list of data.frames
+#' Find Variables Appearing Multiple Data Sets
 #'
 #' @param x the list of data.frames.
 #' @param on the collapse variable.
+#' @param remove_nas remove NA before testing for equivalence? Note all values
+#' at all NA positions are removed.
+#' @importFrom dplyr full_join
 #' @importFrom crayon red
 #' @importFrom equivalent equiv
 #' @export
-var_equiv_violation <- function(x, on) {
-  dup_violations <- c()
+repeat_vars <- function(x, on, x_names = names(x)) {
+  if (is.null(x_names)) {
+    stop(red("The supplied list must have names."))
+  }
+  dup_violations <- list()
   if (length(x) > 1) {
     dup_names <- setdiff(dup_vars(x), on)
     for (dn in dup_names) {
       dup_inds <- which(unlist(lapply(x, function(d) dn %in% colnames(d))))
+      dup_ret <- as_tibble(x[[dup_inds[1]]][,c(on, dn)])
+      colnames(dup_ret)[2] <- x_names[dup_inds[1]]
       for (di in dup_inds[-1]) {
-        if (!equiv(x[[dup_inds[1]]][[dn]][order(x[[dup_inds[1]]][[on]])], 
-                   x[[di]][[dn]][order(x[[dup_inds[1]]][[on]])])) {
-          dup_violations <- c(dup_violations, dn)
-          break
-        }
+        nd <- x[[di]][, c(on, dn)]
+        colnames(nd)[2] <- x_names[di]
+        dup_ret <- full_join(dup_ret, nd, by = on)
       }
+      dup_ret$var <- dn
+      dup_ret <- dup_ret[, c(1, ncol(dup_ret), 
+                             setdiff(seq_len(ncol(dup_ret)), 
+                                     c(1, ncol(dup_ret))))]
+      dup_violations <- c(dup_violations, list(dup_ret))
     }
+    names(dup_violations) <- dup_names
   }
   dup_violations
 }
@@ -108,16 +120,53 @@ dup_vars <- function(x) {
   unique(all_names[duplicated(all_names)])
 }
 
+handle_repeated_vars <- function(arg_list, rvs, on) {
+  new_arg <- NULL
+  for (rv in rvs) {
+    if (isTRUE(all(has_equiv_column(rv)[-(1:3)]))) {
+      new_cols <- rv[,c(1, 3)]
+      colnames(new_cols)[2] <- rv[[2]][1]
+    } else {
+      warning(yellow("No equivalence found for variable", rv$var[1], 
+                     "using most complete data set."))
+      na_counts <- unlist(lapply(rv, function(x) sum(is.na(x))))
+      min_na_val <- min(na_counts[-(1:2)])
+      rv <- rv[, na_counts <= min_na_val]
+      if (isTRUE(all(has_equiv_column(rv)[-(1:3)]))) {
+        new_cols <- rv[,c(1, 3)]
+        colnames(new_cols)[2] <- rv[[2]][1]
+      } else {
+        stop(red("Contradictions in repeated variables.\n", 
+                 "  You need to manually fix variable: ", rv[[2]][1], 
+                 "\n  It appears in data sets:\n\t",
+                 paste(names(na_counts)[-(1:2)], collapse = "\n\t"),
+                 "\n", sep = ""))
+      }
+    }
+    if (is.null(new_arg)) {
+      new_arg <- new_cols
+    } else {
+      new_arg <- full_join(new_arg, new_cols, by = on)
+    }
+  }
+  for (i in seq_along(arg_list)) {
+    rem_inds <- na.omit(match(names(rvs), colnames(arg_list[[i]])))
+    arg_list[[i]] <- arg_list[[i]][, -rem_inds]
+  }
+  c(arg_list, list(new_arg))
+}
+
 #' Consolidate multiple data sets
 #'
 #' @param ... a set of ADaM formatted data.frames.
 #' @param on which variable should be collpased on? (Default: "USUBJID")
+#' @param verbose should extra information be provided? (Default: TRUE)
 #' @return A single data.frame composed of the collapsed and merged input
 #' data.frames.
 #' @importFrom dplyr full_join
 #' @importFrom crayon red
 #' @export
-consolidate_adam <- function(..., on = "USUBJID") {
+consolidate_adam <- function(..., on = "USUBJID", verbose = FALSE) {
   # Get the set of data sets.
   arg_list <- as.list(...)
 
@@ -130,13 +179,20 @@ consolidate_adam <- function(..., on = "USUBJID") {
 
   # Make sure if a variable appears in more than one data set it is the 
   # same in each data set.
-  violations <- var_equiv_violation(arg_list, on = on)
-  if (length(violations) > 0) {
-    stop(red("The following variables appear in multiple data sets but are ",
-             "not consistent\n  and can't be merged:\n\t", 
-             paste(violations, collapse= "\n\t"), 
-             sep = ""))
-  }
+  rvs <- repeat_vars(arg_list, on = on)
+
+  if (length(rvs) > 0) {
+    if (verbose) {
+      cat(italic("Handling repeated variables."))
+    }
+    arg_list <- handle_repeated_vars(arg_list, rvs, on)
+  }  
+#  if (length(violations) > 0) {
+#    stop(red("The following variables appear in multiple data sets but are ",
+#             "not consistent\n  and can't be merged:\n\t", 
+#             paste(violations, collapse= "\n\t"), 
+#             sep = ""))
+#  }
 
   col_names <- list(colnames(arg_list[[1]]))
   all_col_names <- unique(unlist(lapply(arg_list, colnames)))
