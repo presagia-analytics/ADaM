@@ -120,6 +120,7 @@ dup_vars <- function(x) {
   unique(all_names[duplicated(all_names)])
 }
 
+#' @importFrom crayon yellow
 handle_repeated_vars <- function(arg_list, rvs, on) {
   new_arg <- NULL
   for (rv in rvs) {
@@ -154,6 +155,22 @@ handle_repeated_vars <- function(arg_list, rvs, on) {
     arg_list[[i]] <- arg_list[[i]][, -rem_inds]
   }
   c(arg_list, list(new_arg))
+}
+
+#' Find the Data Sets with Conflicting Columns
+#' 
+#' @param x the list of ADaM data sets.
+#' @param on which variable should be collpased on? 
+#' @export
+contradicting_vars <- function(x, on) {
+  rvs <- repeat_vars(x, on = on)
+  ret <- lapply(rvs, function(rv) {
+    r <- c()
+    if (!isTRUE(all(has_equiv_column(rv)[-(1:3)]))) {
+      colnames(rv)[-(1:2)]
+    }
+  })
+  ret[unlist(lapply(ret, function(x) length(x) > 0))]
 }
 
 #' Consolidate multiple data sets
