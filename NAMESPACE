@@ -2,6 +2,7 @@
 
 export(consolidate_adam)
 export(consolidated_describe_adam)
+export(contradicting_vars)
 export(describe_adam)
 export(dup_vars)
 export(normalize_adam)
