@@ -42,7 +42,7 @@ describe_adam <- function(x, data_name = NULL) {
   for (an in all_attr_names) {
     ret[[an]] <- attr_or_na(x, an)
   }
-  tibble(ret)
+  ret
 }
 
 #' @title Consolidate Mulitple Data Set Descriptions
@@ -50,12 +50,19 @@ describe_adam <- function(x, data_name = NULL) {
 #' @param ... a set of ADaM formatted data.frames.
 #' @return A single data.frame composed of descriptions of all variables
 #' for all data sets specified.
-#' @importFrom dplyr bind_rows
+#' @importFrom tibble tibble as_tibble
 #' @export
 consolidated_describe_adam <- function(...) {
   arg_list <- as.list(...)
   aln <- names(arg_list)
-  ret <- NULL
-  bind_rows(Map(function(i) describe_adam(arg_list[[i]], aln[i]), 
-                seq_along(arg_list)))
+  ret <- tibble(data_name = character(), var_name = character(), 
+                type = character(), levels = character(),
+                class = character(), label = character(),
+                format_sas = character())
+  if (length(arg_list) > 0) {
+    ret <- Reduce(rbind, Map(function(i) describe_adam(arg_list[[i]], aln[i]), 
+                             seq_along(arg_list)))
+    names(ret)[7] <- "format_sas"
+  }
+  as_tibble(ret)
 }
