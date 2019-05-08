@@ -1,4 +1,5 @@
 
+#' @importFrom crayon red
 attr_or_na <- function(x, attr) {
   ret <- c()
   for (j in seq_len(ncol(x))) {
@@ -11,7 +12,9 @@ attr_or_na <- function(x, attr) {
     }
     ret <- c(ret, v)
   }
-  if (ncol(x) != length(ret)) browser()
+  if (ncol(x) != length(ret)) {
+    stop(red("Column-return mismatch."))
+  }
   ret
 }
 
@@ -51,6 +54,7 @@ describe_adam <- function(x, data_name = NULL) {
 #' @return A single data.frame composed of descriptions of all variables
 #' for all data sets specified.
 #' @importFrom tibble tibble as_tibble
+#' @importFrom dplyr bind_rows
 #' @export
 consolidated_describe_adam <- function(...) {
   arg_list <- as.list(...)
@@ -60,8 +64,9 @@ consolidated_describe_adam <- function(...) {
                 class = character(), label = character(),
                 format_sas = character())
   if (length(arg_list) > 0) {
-    ret <- Reduce(rbind, Map(function(i) describe_adam(arg_list[[i]], aln[i]), 
-                             seq_along(arg_list)))
+    ret <- Reduce(bind_rows, 
+                  Map(function(i) describe_adam(arg_list[[i]], aln[i]), 
+                      seq_along(arg_list)))
     names(ret)[7] <- "format_sas"
   }
   as_tibble(ret)
