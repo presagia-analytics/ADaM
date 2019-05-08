@@ -11,8 +11,7 @@ repeat_vars(x, on, x_names = names(x))
 
 \item{on}{the collapse variable.}
 
-\item{remove_nas}{remove NA before testing for equivalence? Note all values
-at all NA positions are removed.}
+\item{x_names}{the names of the data sets. (Default names(x))}
 }
 \description{
 Find Variables Appearing Multiple Data Sets

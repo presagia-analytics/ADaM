@@ -78,8 +78,7 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name,
 #'
 #' @param x the list of data.frames.
 #' @param on the collapse variable.
-#' @param remove_nas remove NA before testing for equivalence? Note all values
-#' at all NA positions are removed.
+#' @param x_names the names of the data sets. (Default names(x))
 #' @importFrom dplyr full_join
 #' @importFrom crayon red
 #' @importFrom equivalent equiv
@@ -120,7 +119,9 @@ dup_vars <- function(x) {
   unique(all_names[duplicated(all_names)])
 }
 
+#' @importFrom equivalent has_equiv_column
 #' @importFrom crayon yellow
+#' @importFrom stats na.omit
 handle_repeated_vars <- function(arg_list, rvs, on) {
   new_arg <- NULL
   for (rv in rvs) {
@@ -161,6 +162,7 @@ handle_repeated_vars <- function(arg_list, rvs, on) {
 #' 
 #' @param x the list of ADaM data sets.
 #' @param on which variable should be collpased on? 
+#' @importFrom tibble as_tibble
 #' @export
 contradicting_vars <- function(x, on) {
   rvs <- repeat_vars(x, on = on)

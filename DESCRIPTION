@@ -1,7 +1,7 @@
 Package: ADaM
 Type: Package
 Title: Utilities for working with ADaM files
-Version: 0.0.14
+Version: 0.1.0
 Author: c(
   person("Michael", "Kane",
     role = c("aut", "cph", "cre"),
@@ -11,7 +11,14 @@ Author: c(
 Description: A package for consolidating and processing ADaM files.
 Maintainer: Michael J. Kane <mkane@presagia.ai>
 License: Apache License 2.0
-Imports: dplyr, tidyr, crayon, tibble, normalizer, cli, equivalent
+Imports: 
+  dplyr, 
+  tidyr, 
+  crayon,   
+  tibble, 
+  normalizer, 
+  cli, 
+  equivalent
 Suggests: knitr, testthat
 VignetteBuilder: knitr
 Encoding: UTF-8
