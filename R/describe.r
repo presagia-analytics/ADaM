@@ -42,7 +42,7 @@ describe_adam <- function(x, data_name = NULL) {
   for (an in all_attr_names) {
     ret[[an]] <- attr_or_na(x, an)
   }
-  ret
+  tibble(ret)
 }
 
 #' @title Consolidate Mulitple Data Set Descriptions
