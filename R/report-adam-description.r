@@ -21,6 +21,7 @@
 #' @importFrom dplyr %>%
 #' @importFrom report get_output_format write_render_open
 #' @importFrom crayon red
+#' @importFrom glue glue
 #' @export
 report_adam_desc <- function(x, title = "ADaM Data Description",
                              author = "Some Person",

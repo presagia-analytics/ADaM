@@ -59,7 +59,7 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name,
     cat(green("Mutating character columns to factors.\n"))
     ma <- to_factor(x)
     if (length(ma) == 0) {
-      cat(italic("No variables to turn into factor."))
+      cat(italic("No variables to turn into factor.\n"))
     } else {
       cat(
         italic("\tThe following variables will be turned into factors:\n\t\t"))
