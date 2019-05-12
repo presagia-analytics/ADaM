@@ -67,7 +67,7 @@ consolidated_describe_adam <- function(...) {
     ret <- Reduce(bind_rows, 
                   Map(function(i) describe_adam(arg_list[[i]], aln[i]), 
                       seq_along(arg_list)))
-    names(ret)[7] <- "format_sas"
+    names(ret)[which(names(ret) == "format.sas")] <- "format_sas"
   }
   as_tibble(ret)
 }

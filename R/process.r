@@ -79,7 +79,7 @@ normalize_adam <- function(x, on = "USUBJID", collapse_name,
 #' @param x the list of data.frames.
 #' @param on the collapse variable.
 #' @param x_names the names of the data sets. (Default names(x))
-#' @importFrom dplyr full_join
+#' @importFrom dplyr full_join distinct
 #' @importFrom crayon red
 #' @importFrom equivalent equiv
 #' @export
@@ -94,10 +94,11 @@ repeat_vars <- function(x, on, x_names = names(x)) {
       dup_inds <- which(unlist(lapply(x, function(d) dn %in% colnames(d))))
       dup_ret <- as_tibble(x[[dup_inds[1]]][,c(on, dn)])
       colnames(dup_ret)[2] <- x_names[dup_inds[1]]
+      dup_ret <- dup_ret[!duplicated(dup_ret[[on]]),]
       for (di in dup_inds[-1]) {
         nd <- x[[di]][, c(on, dn)]
         colnames(nd)[2] <- x_names[di]
-        dup_ret <- full_join(dup_ret, nd, by = on)
+        dup_ret <- full_join(dup_ret, nd[!duplicated(nd[[on]]),], by = on)
       }
       dup_ret$var <- dn
       dup_ret <- dup_ret[, c(1, ncol(dup_ret), 
