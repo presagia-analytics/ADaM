@@ -1,3 +1,95 @@
+#' Process, Normalize, and, Consolidate ADaM Data Sets
+#'
+#' @param x a named list of data.frames.
+#' @param on which variable should be collpased on? (Default: "USUBJID")
+#' @param handle_contra_vals if variables have contradicting values across
+#' data.frame's, then can they be handled by using the first instance of
+#' the variable in the set? (Default FALSE) See Details for more information.
+#' @param verbose should extra information be provided? (Default TRUE)
+#' @param collapse_name the variable name of the collapsed sub-data.frames.
+#' Default is the names of 'x'.
+#' @details Setting 'handle_contra_vals' to TRUE should be used with 
+#' extreme caution. If it is used then the contradicting value are stored
+#' as an attribute of the consolidated data.frame and can be retrieved using
+#' the function 'get_contradictions()'.
+#' @importFrom cli cat_rule
+#' @importFrom crayon yellow
+#' @importFrom dplyr select 
+#' @export
+pnc_adam <- function(x, on = "USUBJID", handle_contra_vals = FALSE, 
+                     collapse_name = names(x), remove_equiv_columns = TRUE, 
+                     remove_numerically_encoded = TRUE, keep_cols = character(),
+                     verbose = TRUE) {
+
+  xs <- lapply(seq_along(x),
+  function(i) {
+    if (verbose) {
+      cat("\n")
+      cat_rule(paste("Processing", names(x)[i]))
+      cat("\n")
+    }
+
+    normalize_adam(x[[i]], 
+                   on = 'SUBJECT',
+                   collapse_name = collapse_name[i],
+                   remove_equiv_columns = remove_equiv_columns,
+                   remove_numerically_encoded = remove_numerically_encoded,
+                   keep_cols = character(),
+                   verbose = verbose)
+  })
+  
+  if (verbose) {
+    cat("\n")
+  }
+  names(xs) <- collapse_name
+
+  var_contradictions <- contradicting_vars(xs, on = on)
+  contradictions <- list()
+
+  if (length(var_contradictions) > 0) {
+    if (!handle_contra_vals) {
+      contra_string <- c()
+      for (i in seq_along(var_contradictions)) {
+        contra_string <- c(contra_string, 
+          paste0(paste0(names(var_contradictions)[i], ": "),
+                 paste(var_contradictions[[i]], collapse = " "), 
+                 collapse = " "))
+      }
+      stop(red("Contradicting variables:\n\t",
+               paste(contra_string, collapse = "\n\t"), sep = ""))
+    } else {
+      for (i in seq_along(var_contradictions)) {
+        vct <- NULL
+        var_contrs <- var_contradictions[[i]]
+        var_name <- names(var_contradictions)[i]
+        for (vc in var_contrs[-1]) {
+          if (is.null(vct)) {
+            vct <- xs[[vc]][, c(on, var_name)]
+            names(vct)[2] <- vc
+          } else {
+            vt <- xs[[vc]][, c(on, var_name)]
+            names(vt)[2] <- vc
+            vct <- full_join(vct, vt, by = on)
+          }
+          xs[[vc]] <- xs[[vc]] %>% select(-!!var_name)
+        }
+        contradictions <- c(contradictions, list(vct))
+      }
+      names(contradictions) <- names(var_contradictions)
+    }
+    
+  }
+
+  xs <- consolidate_adam(xs, on = on)
+  if (remove_equiv_columns) {
+    xs <- remove_equiv_columns(xs, verbose = verbose)
+  }
+  if (length(contradictions) > 0) {
+    attributes(xs)$contra <- contradictions
+  }
+  xs
+}
+
 #' Print a message
 #' 
 #' @param x the data the function will return
