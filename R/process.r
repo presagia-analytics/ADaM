@@ -30,7 +30,7 @@ pnc_adam <- function(x, on = "USUBJID", handle_contra_vals = FALSE,
     }
 
     normalize_adam(x[[i]], 
-                   on = 'SUBJECT',
+                   on = on,
                    collapse_name = collapse_name[i],
                    remove_equiv_columns = remove_equiv_columns,
                    remove_numerically_encoded = remove_numerically_encoded,
