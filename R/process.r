@@ -13,7 +13,7 @@
 #' as an attribute of the consolidated data.frame and can be retrieved using
 #' the function 'get_contradictions()'.
 #' @importFrom cli cat_rule
-#' @importFrom crayon yellow
+#' @importFrom crayon yellow red
 #' @importFrom dplyr select 
 #' @export
 pnc_adam <- function(x, on = "USUBJID", handle_contra_vals = FALSE, 
@@ -48,15 +48,19 @@ pnc_adam <- function(x, on = "USUBJID", handle_contra_vals = FALSE,
 
   if (length(var_contradictions) > 0) {
     if (!handle_contra_vals) {
-      contra_string <- c()
-      for (i in seq_along(var_contradictions)) {
-        contra_string <- c(contra_string, 
+      contra_string <- paste(vapply(seq_along(var_contradictions),
+        function(i) {
           paste0(paste0(names(var_contradictions)[i], ": "),
-                 paste(var_contradictions[[i]], collapse = " "), 
-                 collapse = " "))
+                 paste(var_contradictions[[i]], collapse = " "),
+                 collapse = " ")
+        }, ""), collapse = "\n\t")
+      err_mesg <- paste0("Contradicting variables:\n\t", contra_string)
+      if (nchar(err_mesg) > getOption("warning.length")) {
+        warning(
+          yellow("Increasing warning length to accomodate error message."))
+        options("warning.length" = nchar(err_mesg))
       }
-      stop(red("Contradicting variables:\n\t",
-               paste(contra_string, collapse = "\n\t"), sep = ""))
+      stop(red(err_mesg))
     } else {
       for (i in seq_along(var_contradictions)) {
         vct <- NULL
