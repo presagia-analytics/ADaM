@@ -255,20 +255,54 @@ handle_repeated_vars <- function(arg_list, rvs, on) {
   c(arg_list, list(new_arg))
 }
 
+#' Create a Set of data.frame with Contradictions.
+#'
+#' @param x the list of ADaM data sets.
+#' @param on which variable should be collpased on? 
+#' @importFrom dplyr full_join distinct 
+#' @importFrom foreach foreach %dopar% %do%
+#' @importFrom crayon yellow
+#' @export
+contradiction_tibbles <- function(x, on) {
+  cvs <- contradicting_vars(x, on)
+  contras <- foreach(i = seq_along(cvs)) %dopar% {
+    rs <- foreach (j = seq_along(cvs[[i]])) %do% {
+      ds <- distinct(x[cvs[[i]]][[j]][, c(on, names(cvs)[i])])
+      if (isTRUE(any(duplicated(ds[[on]])))) {
+        warning(yellow("Removing repeated values in variable name: ", 
+                       names(cvs)[i], " data set: ", cvs[[i]][j], sep = ""))
+        ds <- ds[!duplicated(ds[[on]]),]
+      }
+      names(ds)[2] <- cvs[[i]][j]
+      ds
+    }
+    Reduce(function(x, y) full_join(x, y, by = on), rs)
+  }
+  names(contras) <- names(cvs)
+  contras
+}
+
 #' Find the Data Sets with Conflicting Columns
 #' 
 #' @param x the list of ADaM data sets.
 #' @param on which variable should be collpased on? 
 #' @importFrom tibble as_tibble
+#' @importFrom foreach foreach %dopar% registerDoSEQ getDoParName
 #' @export
 contradicting_vars <- function(x, on) {
   rvs <- repeat_vars(x, on = on)
-  ret <- lapply(rvs, function(rv) {
+  if (is.null(getDoParName())) {
+    registerDoSEQ()
+  }
+  ret <- foreach(rv = rvs) %dopar% {
+#lapply(rvs, function(rv) {
     r <- c()
     if (!isTRUE(all(has_equiv_column(rv)[-(1:3)]))) {
       colnames(rv)[-(1:2)]
     }
-  })
+  }
+#)
+  names(ret) <- names(rvs)
   ret[unlist(lapply(ret, function(x) length(x) > 0))]
 }
 
