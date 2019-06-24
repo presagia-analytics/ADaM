@@ -1,4 +1,4 @@
-#' Process, Normalize, and, Consolidate ADaM Data Sets
+#' Process, Normalize, and, Consolidate Data Sets
 #'
 #' @param x a named list of data.frames.
 #' @param on which variable should be collpased on? (Default: "USUBJID")
@@ -16,10 +16,10 @@
 #' @importFrom crayon yellow red
 #' @importFrom dplyr select 
 #' @export
-pnc_adam <- function(x, on = "USUBJID", handle_contra_vals = FALSE, 
-                     collapse_name = names(x), remove_equiv_columns = TRUE, 
-                     remove_numerically_encoded = TRUE, keep_cols = character(),
-                     verbose = TRUE) {
+pnc_ds <- function(x, on = "USUBJID", handle_contra_vals = FALSE, 
+                   collapse_name = names(x), remove_equiv_columns = TRUE, 
+                   remove_numerically_encoded = TRUE, keep_cols = character(),
+                   verbose = TRUE) {
 
   xs <- lapply(seq_along(x),
   function(i) {

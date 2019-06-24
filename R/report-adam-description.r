@@ -41,7 +41,7 @@ report_adam_desc <- function(x, title = "ADaM Data Description",
     stop(red("Don't know how to create ADaM description for an object ",
              "class: ", class(x), ".", sep = ""))
   }
-  desc_tibble <- desc_tibble[, c(1:3, 5:7, 4)]
+  #desc_tibble <- desc_tibble[, c(1:3, 5:7, 4)]
   report_str <- paste0(glue(report:::r_code_template,
                             r_code = paste("library(knitr)",
                                            "x <- readRDS('x.rds')",
@@ -56,4 +56,3 @@ report_adam_desc <- function(x, title = "ADaM Data Description",
   
   invisible(x)
 }
-
